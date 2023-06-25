@@ -8,7 +8,7 @@ This library was written to scratch a personal itch.  I have found GPT 3.5 to be
 1. Have syntax highlighting on ChatGPT responses
 1. Have multi-line editing capabilities on multi-line prompts
 
-THis library is just that.
+This library is precisely that, and no more.
 
 ## Installation
 
@@ -25,3 +25,8 @@ There is one required environment variable, `OPENAI_API_KEY`, which should conta
 Invoke the program with `ai`.  There are few controls. Simply enter a prompt, and hit Escape THEN Enter to submit the prompt.
 
 Inside of each session there is a history, and you can use the up arrow to revisit and edit previous prompts.
+
+Here is a simple example
+
+![An example of using aissist to write Python](images/screenshot.png)
+

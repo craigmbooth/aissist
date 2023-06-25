@@ -1,12 +1,13 @@
 import os
 import sys
-from prompt_toolkit import PromptSession
-import threading
-import time
+
 import openai
+from prompt_toolkit import PromptSession
 from pygments import highlight
-from pygments.lexers import get_lexer_by_name, guess_lexer
+from pygments.lexers import guess_lexer
 from pygments.formatters import TerminalFormatter
+
+from spinner import Spinner
 
 try:
     openai.api_key = os.environ["OPENAI_API_KEY"]
@@ -19,23 +20,6 @@ prompt = """You are a helpful but succinct chatbot that assists an impatient pro
 
 session = PromptSession()
 
-spinner_flag = True  # Flag to control the spinner
-
-def spinner():
-    while spinner_flag:
-        for char in '|/-\\':
-            sys.stdout.write('\r' + char)
-            sys.stdout.flush()
-            time.sleep(0.1)
-    sys.stdout.write("\r")
-
-def stop_spinner():
-    global spinner_flag
-    spinner_flag = False
-
-def start_spinner():
-    global spinner_flag
-    spinner_flag = True
 
 def prompt_continuation(width: int,
                         line_number,
@@ -103,17 +87,15 @@ def loop(messages):
         {"role": "user", "content": result}
     )
 
-    start_spinner()
-    spinner_thread = threading.Thread(target=spinner)
-    spinner_thread.start()
+    spinner = Spinner()
+    spinner.start()
 
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages,
     )
     message = response["choices"][0]["message"]
-    stop_spinner()
-    spinner_thread.join()
+    spinner.stop()
 
     messages.append(message)
     print(" ")

@@ -1,6 +1,6 @@
 [project]
-name = "aissistant"
-version = "0.0.1"
+name = "aissist"
+version = "0.0.3"
 description = "A simple GPT command line interface"
 authors = [
   { name = "Craig Booth", email = "craigmbooth@gmail.com" },
@@ -27,13 +27,13 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/craigmbooth/aissistant"
-"Bug Tracker" = "https://github.com/craigmbooth/aissistant/issues"
+"Homepage" = "https://github.com/craigmbooth/aissist"
+"Bug Tracker" = "https://github.com/craigmbooth/aissist/issues"
 
 [build-system]
 requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project.scripts]
-ai = "aissistant.assistant:main"
+ai = "aissist.aissistant:main"
 
