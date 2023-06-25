@@ -7,7 +7,12 @@ import openai
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
 from pygments.formatters import TerminalFormatter
-openai.api_key = os.environ["OPENAI_API_KEY"]
+
+try:
+    openai.api_key = os.environ["OPENAI_API_KEY"]
+except KeyError:
+    print("Please put your API key in the OPENAI_API_KEY environment variable.")
+    sys.exit(1)
 
 prompt = """You are a helpful but succinct chatbot that assists an impatient programmer by directly answering questions. You understand that the programmer is advanced enough to understand succinct phrases and prefers direct answers with little boilerplate.
 """
@@ -87,17 +92,12 @@ def highlight_codeblocks(markdown):
         else:
             line = bold_single_backticks(line)
             print(line)
-        
+
+def loop(messages):
+    """Main loop for the program"""
     
-print("AI coding assistant (ESCAPE followed by ENTER to send)")
-
-messages = [
-    {"role": "system", "content": prompt}
-]
-
-while True:
     result = session.prompt(">>> ", multiline=True,
-                   prompt_continuation=prompt_continuation)
+                prompt_continuation=prompt_continuation)
 
     messages.append(
         {"role": "user", "content": result}
@@ -119,3 +119,25 @@ while True:
     print(" ")
     highlight_codeblocks(message["content"])
     print(" ")
+
+    return messages
+
+def main():
+
+    print("ESCAPE followed by ENTER to send. Ctrl-C to quit")
+
+    messages = [
+        {"role": "system", "content": prompt}
+    ]
+
+    try:
+        while True:
+            messages = loop(messages)
+    except (KeyboardInterrupt, EOFError):
+        # Ctrl-C and Ctrl-D
+        sys.exit(0)
+    except Exception:
+        raise
+
+if __name__ == "__main__":
+    main()

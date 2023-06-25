@@ -1,0 +1,39 @@
+[project]
+name = "aissistant"
+version = "0.0.1"
+description = "A simple GPT command line interface"
+authors = [
+  { name = "Craig Booth", email = "craigmbooth@gmail.com" },
+]
+license = { file = "LICENSE" }
+
+readme = "README.md"
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+requires-python = ">=3.7"
+
+dependencies = [
+  "openai<0.28",
+  "prompt_toolkit<4",
+  "pygments<3",
+  "requests<3",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/craigmbooth/aissistant"
+"Bug Tracker" = "https://github.com/craigmbooth/aissistant/issues"
+
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project.scripts]
+ai = "aissistant.assistant:main"
+
