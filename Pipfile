@@ -8,8 +8,12 @@ prompt-toolkit = "*"
 openai = "*"
 pygments = "*"
 flit = "*"
+tomlkit = "*"
+toml = "*"
+isort = "*"
 
 [dev-packages]
+black = "*"
 
 [requires]
 python_version = "3.8"

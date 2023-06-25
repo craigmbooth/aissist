@@ -1,7 +1,8 @@
 import sys
-import time
 import threading
+import time
 from typing import Optional
+
 
 class Spinner:
     """Simple implementation of a spinner"""
@@ -13,7 +14,7 @@ class Spinner:
     def spinner(self, spin_delay: float = 0.12):
         while self.spinner_flag:
             for char in "|/-\\":
-                sys.stdout.write('\r' + char)
+                sys.stdout.write("\r" + char)
                 sys.stdout.flush()
                 time.sleep(spin_delay)
         sys.stdout.write("\r")

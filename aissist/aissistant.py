@@ -4,10 +4,11 @@ import sys
 import openai
 from prompt_toolkit import PromptSession
 from pygments import highlight
-from pygments.lexers import guess_lexer
 from pygments.formatters import TerminalFormatter
+from pygments.lexers import guess_lexer
 
-from spinner import Spinner
+from .spinner import Spinner
+from .version import __version__
 
 try:
     openai.api_key = os.environ["OPENAI_API_KEY"]
@@ -21,10 +22,8 @@ prompt = """You are a helpful but succinct chatbot that assists an impatient pro
 session = PromptSession()
 
 
-def prompt_continuation(width: int,
-                        line_number,
-                        is_soft_wrap):
-    return '.' * (width-1) + " "
+def prompt_continuation(width: int, line_number, is_soft_wrap):
+    return "." * (width - 1) + " "
 
 
 def bold_single_backticks(text):
@@ -32,26 +31,25 @@ def bold_single_backticks(text):
     using ANSI escape codes.
     """
     in_backticks = False
-    result = ''
+    result = ""
     for indx, c in enumerate(text):
-        if c == '`':
-            
+        if c == "`":
             if in_backticks:
-                result += '\033[0m'  # Reset text formatting
+                result += "\033[0m"  # Reset text formatting
                 in_backticks = False
             else:
-                result += '\033[1m'  # Bold text
+                result += "\033[1m"  # Bold text
                 in_backticks = True
         else:
             result += c
 
     if in_backticks:
-        result += '\033[0m'  # Reset text formatting
+        result += "\033[0m"  # Reset text formatting
 
     return result
 
 
-def highlight_codeblocks(markdown):
+def highlight_codeblocks(markdown, columns: int):
     """Highlights code blocks in a markdown string and prints them to the console
     using pygments library.
     """
@@ -59,7 +57,6 @@ def highlight_codeblocks(markdown):
     inside_block = False
     current_block = ""
     for line in markdown.split("\n"):
-
         if line.startswith("```"):
             if inside_block is True:
                 # We are exiting a block, print it
@@ -75,17 +72,17 @@ def highlight_codeblocks(markdown):
             current_block += line + "\n"
         else:
             line = bold_single_backticks(line)
-            print(line)
+            sys.stdout.write(line)
+
 
 def loop(messages):
     """Main loop for the program"""
-    
-    result = session.prompt(">>> ", multiline=True,
-                prompt_continuation=prompt_continuation)
 
-    messages.append(
-        {"role": "user", "content": result}
+    result = session.prompt(
+        ">>> ", multiline=True, prompt_continuation=prompt_continuation
     )
+
+    messages.append({"role": "user", "content": result})
 
     spinner = Spinner()
     spinner.start()
@@ -95,22 +92,23 @@ def loop(messages):
         messages=messages,
     )
     message = response["choices"][0]["message"]
+
     spinner.stop()
 
     messages.append(message)
+
     print(" ")
-    highlight_codeblocks(message["content"])
+    terminal_width = os.get_terminal_size().columns
+    highlight_codeblocks(message["content"], columns=terminal_width)
     print(" ")
 
     return messages
 
+
 def main():
+    print(f"AIssist v.{__version__}. ESCAPE followed by ENTER to send. Ctrl-C to quit")
 
-    print("ESCAPE followed by ENTER to send. Ctrl-C to quit")
-
-    messages = [
-        {"role": "system", "content": prompt}
-    ]
+    messages = [{"role": "system", "content": prompt}]
 
     try:
         while True:
@@ -120,6 +118,7 @@ def main():
         sys.exit(0)
     except Exception:
         raise
+
 
 if __name__ == "__main__":
     main()
