@@ -7,6 +7,7 @@ from pygments import highlight
 from pygments.formatters import TerminalFormatter
 from pygments.lexers import guess_lexer
 
+from .config import Config
 from .spinner import Spinner
 from .version import __version__
 
@@ -75,7 +76,7 @@ def highlight_codeblocks(markdown, columns: int):
             sys.stdout.write(line)
 
 
-def loop(messages):
+def loop(messages, config: Config):
     """Main loop for the program"""
 
     result = session.prompt(
@@ -84,11 +85,14 @@ def loop(messages):
 
     messages.append({"role": "user", "content": result})
 
+    import pdb; pdb.set_trace()
+
     spinner = Spinner()
     spinner.start()
 
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model=config.get("model"),
+        temperature=config.get("temperature"),
         messages=messages,
     )
     message = response["choices"][0]["message"]
@@ -108,11 +112,13 @@ def loop(messages):
 def main():
     print(f"AIssist v.{__version__}. ESCAPE followed by ENTER to send. Ctrl-C to quit")
 
+    config = Config()
+
     messages = [{"role": "system", "content": prompt}]
 
     try:
         while True:
-            messages = loop(messages)
+            messages = loop(messages, config)
     except (KeyboardInterrupt, EOFError):
         # Ctrl-C and Ctrl-D
         sys.exit(0)
