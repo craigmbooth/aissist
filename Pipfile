@@ -7,13 +7,13 @@ name = "pypi"
 prompt-toolkit = "*"
 openai = "*"
 pygments = "*"
-flit = "*"
 tomlkit = "*"
 toml = "*"
 isort = "*"
 
+
 [dev-packages]
 black = "*"
-
+flit = "*"
 [requires]
 python_version = "3.8"

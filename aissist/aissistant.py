@@ -3,10 +3,12 @@ import sys
 
 import openai
 from prompt_toolkit import PromptSession
+from prompt_toolkit.styles import Style
 from pygments import highlight
-from pygments.formatters import TerminalFormatter
+from pygments.formatters import TerminalTrueColorFormatter
 from pygments.lexers import guess_lexer
 
+from .code_formatter import CodeFormatter
 from .config import Config
 from .spinner import Spinner
 from .version import __version__
@@ -17,66 +19,12 @@ except KeyError:
     print("Please put your API key in the OPENAI_API_KEY environment variable.")
     sys.exit(1)
 
-prompt = """You are a helpful but succinct chatbot that assists an impatient programmer by directly answering questions. You understand that the programmer is advanced enough to understand succinct phrases and prefers direct answers with little boilerplate.
-"""
-
-session = PromptSession()
-
 
 def prompt_continuation(width: int, line_number, is_soft_wrap):
     return "." * (width - 1) + " "
 
 
-def bold_single_backticks(text):
-    """Formats a given string by making text enclosed in single backticks bold,
-    using ANSI escape codes.
-    """
-    in_backticks = False
-    result = ""
-    for indx, c in enumerate(text):
-        if c == "`":
-            if in_backticks:
-                result += "\033[0m"  # Reset text formatting
-                in_backticks = False
-            else:
-                result += "\033[1m"  # Bold text
-                in_backticks = True
-        else:
-            result += c
-
-    if in_backticks:
-        result += "\033[0m"  # Reset text formatting
-
-    return result
-
-
-def highlight_codeblocks(markdown, columns: int):
-    """Highlights code blocks in a markdown string and prints them to the console
-    using pygments library.
-    """
-
-    inside_block = False
-    current_block = ""
-    for line in markdown.split("\n"):
-        if line.startswith("```"):
-            if inside_block is True:
-                # We are exiting a block, print it
-                lexer = guess_lexer(current_block)
-                formatted_code = highlight(current_block, lexer, TerminalFormatter())
-                print(formatted_code)
-            else:
-                # We are entering a block
-                current_block = ""
-            inside_block = not inside_block
-
-        elif inside_block is True:
-            current_block += line + "\n"
-        else:
-            line = bold_single_backticks(line)
-            sys.stdout.write(line)
-
-
-def loop(messages, config: Config):
+def loop(messages, config: Config, session, code_formatter: CodeFormatter):
     """Main loop for the program"""
 
     result = session.prompt(
@@ -84,8 +32,6 @@ def loop(messages, config: Config):
     )
 
     messages.append({"role": "user", "content": result})
-
-    import pdb; pdb.set_trace()
 
     spinner = Spinner()
     spinner.start()
@@ -103,22 +49,29 @@ def loop(messages, config: Config):
 
     print(" ")
     terminal_width = os.get_terminal_size().columns
-    highlight_codeblocks(message["content"], columns=terminal_width)
-    print(" ")
+    code_formatter.highlight_codeblocks(message["content"], columns=terminal_width)
+    print("\n")
 
     return messages
 
 
 def main():
     print(f"AIssist v.{__version__}. ESCAPE followed by ENTER to send. Ctrl-C to quit")
-
+    print("\n")
     config = Config()
+
+    prompt = config.get_prompt()
+
+    style = Style.from_dict({"prompt": "#aaaaaa"})
+    session = PromptSession(style=style)
 
     messages = [{"role": "system", "content": prompt}]
 
+    code_formatter = CodeFormatter(config)
+
     try:
         while True:
-            messages = loop(messages, config)
+            messages = loop(messages, config, session, code_formatter)
     except (KeyboardInterrupt, EOFError):
         # Ctrl-C and Ctrl-D
         sys.exit(0)
