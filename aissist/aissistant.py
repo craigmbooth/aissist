@@ -8,8 +8,9 @@ from pygments import highlight
 from pygments.formatters import TerminalTrueColorFormatter
 from pygments.lexers import guess_lexer
 
-from .code_formatter import CodeFormatter
 from .config import Config
+from .exceptions import AIssistError
+from .model import Model
 from .spinner import Spinner
 from .version import __version__
 
@@ -24,57 +25,55 @@ def prompt_continuation(width: int, line_number, is_soft_wrap):
     return "." * (width - 1) + " "
 
 
-def loop(messages, config: Config, session, code_formatter: CodeFormatter):
+def loop(config: Config, model: Model):
     """Main loop for the program"""
 
-    result = session.prompt(
-        ">>> ", multiline=True, prompt_continuation=prompt_continuation
-    )
+    # Move the fdollowing two lines into config, too
+    style = Style.from_dict({"prompt": "#aaaaaa"})
+    session = PromptSession(style=style)
+    prompt = config.get_prompt()
 
-    messages.append({"role": "user", "content": result})
+    messages = [{"role": "system", "content": prompt}]
 
-    spinner = Spinner()
-    spinner.start()
+    while True:
+        result = session.prompt(
+            ">>> ", multiline=True, prompt_continuation=prompt_continuation
+        )
 
-    response = openai.ChatCompletion.create(
-        model=config.get("model"),
-        temperature=config.get("temperature"),
-        messages=messages,
-    )
-    message = response["choices"][0]["message"]
+        messages.append({"role": "user", "content": result})
 
-    spinner.stop()
+        spinner = Spinner()
+        spinner.start()
 
-    messages.append(message)
+        new_message = model.call(messages, config)
+        spinner.stop()
 
-    print(" ")
-    terminal_width = os.get_terminal_size().columns
-    code_formatter.highlight_codeblocks(message["content"], columns=terminal_width)
-    print("\n")
+        messages.append(new_message)
 
-    return messages
+        print(" ")
+        terminal_width = os.get_terminal_size().columns
+        config.code_formatter.highlight_codeblocks(
+            new_message["content"], columns=terminal_width
+        )
+        print("\n")
 
 
 def main():
     print(f"AIssist v.{__version__}. ESCAPE followed by ENTER to send. Ctrl-C to quit")
     print("\n")
+
     config = Config()
-
-    prompt = config.get_prompt()
-
-    style = Style.from_dict({"prompt": "#aaaaaa"})
-    session = PromptSession(style=style)
-
-    messages = [{"role": "system", "content": prompt}]
-
-    code_formatter = CodeFormatter(config)
+    model = Model(config.get("model"))
 
     try:
         while True:
-            messages = loop(messages, config, session, code_formatter)
+            loop(config, model)
     except (KeyboardInterrupt, EOFError):
         # Ctrl-C and Ctrl-D
         sys.exit(0)
+    except AIssistError as e:
+        print(e)
+        sys.exit(1)
     except Exception:
         raise
 

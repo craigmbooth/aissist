@@ -1,7 +1,7 @@
 [project]
 name = "aissist"
-version = "0.0.9"
-description = "A simple GPT command line interface"
+version = "0.0.10"
+description = "A simple GPT command line chat interface"
 authors = [
   { name = "Craig Booth", email = "craigmbooth@gmail.com" },
 ]
@@ -24,6 +24,7 @@ dependencies = [
   "prompt_toolkit<4",
   "pygments<3",
   "requests<3",
+  "tiktoken<1",
   "tomlkit<1"
 ]
 

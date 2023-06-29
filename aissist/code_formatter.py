@@ -1,5 +1,4 @@
 import shutil
-import sys
 import textwrap
 
 from pygments import highlight
@@ -8,8 +7,8 @@ from pygments.lexers import guess_lexer
 
 
 class CodeFormatter:
-    def __init__(self, config):
-        self.config = config
+    def __init__(self, color_scheme: str):
+        self.color_scheme = color_scheme
 
     def bold_single_backticks(self, text):
         """Formats a given string by making text enclosed in single backticks bold,
@@ -50,9 +49,7 @@ class CodeFormatter:
                     formatted_code = highlight(
                         current_block,
                         lexer,
-                        TerminalTrueColorFormatter(
-                            style=self.config.get("color-scheme")
-                        ),
+                        TerminalTrueColorFormatter(style=self.color_scheme),
                     )
                     print(formatted_code)
                 else:

@@ -10,10 +10,11 @@ pygments = "*"
 tomlkit = "*"
 toml = "*"
 isort = "*"
-
+tiktoken = "*"
 
 [dev-packages]
 black = "*"
 flit = "*"
+
 [requires]
 python_version = "3.8"

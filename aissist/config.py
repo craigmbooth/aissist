@@ -5,6 +5,7 @@ from typing import Any, Type
 
 from tomlkit import comment, document, nl, parse, table
 
+from .code_formatter import CodeFormatter
 from .prompts import DEFAULT_PROMPTS
 
 
@@ -43,6 +44,11 @@ class Config:
             0.0,
             comment="A number in the range 0 to 1. Higher values lead to more unpredictable but creative outputs.",
         ),
+        "max_tokens": Parameter(
+            int,
+            800,
+            comment="The maximum number of tokens to generate. Requests can use up to 2048 tokens shared between prompt and response.",
+        ),
     }
 
     def __init__(self):
@@ -63,6 +69,10 @@ class Config:
             self.read_config()
 
         self.add_command_line_args()
+
+    @property
+    def code_formatter(self) -> CodeFormatter:
+        return CodeFormatter(self.parameters["color-scheme"].value)
 
     def get_prompt(self) -> str:
         prompt = self.parameters["prompt"].value
