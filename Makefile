@@ -3,4 +3,4 @@ fix-style:
 	isort --profile black aissist
 
 test:
-	mypy aissist
+	mypy --strict aissist

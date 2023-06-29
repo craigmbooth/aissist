@@ -11,7 +11,7 @@ class Spinner:
         self.spinner_flag: bool = True
         self.thread: Optional[threading.Thread] = None
 
-    def spinner(self, spin_delay: float = 0.12):
+    def spinner(self, spin_delay: float = 0.12) -> None:
         while self.spinner_flag:
             for char in "|/-\\":
                 sys.stdout.write("\r" + char)

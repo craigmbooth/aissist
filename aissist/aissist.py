@@ -51,10 +51,8 @@ def loop(config: Config, model: Model):
         messages.append(new_message)
 
         print(" ")
-        terminal_width = os.get_terminal_size().columns
         config.code_formatter.highlight_codeblocks(
-            new_message["content"], columns=terminal_width
-        )
+            new_message["content"])
         print("\n")
 
 

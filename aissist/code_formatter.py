@@ -7,16 +7,16 @@ from pygments.lexers import guess_lexer
 
 
 class CodeFormatter:
-    def __init__(self, color_scheme: str):
+    def __init__(self, color_scheme: str) -> None:
         self.color_scheme = color_scheme
 
-    def bold_single_backticks(self, text):
+    def bold_single_backticks(self, text: str) -> str:
         """Formats a given string by making text enclosed in single backticks bold,
         using ANSI escape codes.
         """
         in_backticks = False
         result = ""
-        for indx, c in enumerate(text):
+        for c in text:
             if c == "`":
                 if in_backticks:
                     result += "\033[0m"  # Reset text formatting
@@ -32,7 +32,7 @@ class CodeFormatter:
 
         return result
 
-    def highlight_codeblocks(self, markdown, columns: int):
+    def highlight_codeblocks(self, markdown: str) -> None:
         """Highlights code blocks in a markdown string and prints them to the console
         using pygments library.
         """
