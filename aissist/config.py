@@ -46,8 +46,8 @@ class Config:
         ),
         "max_tokens": Parameter(
             int,
-            800,
-            comment="The maximum number of tokens to generate. Requests can use up to 2048 tokens shared between prompt and response.",
+            1000,
+            comment="The maximum number of tokens to generate. Requests can use up to the model maximum tokens shared between prompt and response.",
         ),
     }
 
@@ -79,10 +79,16 @@ class Config:
         return self.prompts[prompt]
 
     def add_command_line_args(self) -> None:
-        parser = argparse.ArgumentParser()
+        parser = argparse.ArgumentParser(
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        )
         for name, param in self.default_parameters.items():
             parser.add_argument(
-                f"--{name}", type=param.type, default=param.value, help=param.comment
+                f"--{name}",
+                type=param.type,
+                default=param.value,
+                metavar=f"<{name}>",
+                help=param.comment,
             )
         args = parser.parse_args()
 
