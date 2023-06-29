@@ -7,7 +7,7 @@ from typing import Optional
 class Spinner:
     """Simple implementation of a spinner"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.spinner_flag: bool = True
         self.thread: Optional[threading.Thread] = None
 
@@ -19,11 +19,12 @@ class Spinner:
                 time.sleep(spin_delay)
         sys.stdout.write("\r")
 
-    def stop(self):
+    def stop(self) -> None:
         self.spinner_flag = False
-        self.thread.join()
+        if self.thread is not None:
+            self.thread.join()
 
-    def start(self):
+    def start(self) -> None:
         self.spinner_flag = True
         self.thread = threading.Thread(target=self.spinner)
         self.thread.start()

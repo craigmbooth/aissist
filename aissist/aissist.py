@@ -30,7 +30,7 @@ def loop(config: Config, model: Model):
 
     # Move the fdollowing two lines into config, too
     style = Style.from_dict({"prompt": "#aaaaaa"})
-    session = PromptSession(style=style)
+    session: PromptSession = PromptSession(style=style)
     prompt = config.get_prompt()
 
     messages = [{"role": "system", "content": prompt}]

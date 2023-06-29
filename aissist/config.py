@@ -1,7 +1,7 @@
 import argparse
 import dataclasses
 import os
-from typing import Any, Type
+from typing import Any, Type, cast
 
 from tomlkit import comment, document, nl, parse, table
 
@@ -25,7 +25,7 @@ class Parameter:
 
 
 class Config:
-    default_parameters: "dict[str, Parameter]" = {
+    default_parameters: dict[str, Parameter] = {
         "model": Parameter(
             str, "gpt-3.5-turbo", comment="The default OpenAI model name to use"
         ),
@@ -51,8 +51,8 @@ class Config:
         ),
     }
 
-    def __init__(self):
-        self.parameters: list[Parameter] = []
+    def __init__(self) -> None:
+        self.parameters: dict[str, Parameter] = {}
         self.prompts: dict[str, str] = {}
 
         self.config_file = os.path.join(os.path.expanduser("~"), ".aissistrc")
@@ -121,14 +121,14 @@ class Config:
         with open(self.config_file, "r") as f:
             doc = parse(f.read())
 
-        for name, param in doc["parameters"].items():
+        for name, param in cast(dict, doc["parameters"]).items():
             if name not in self.parameters:
                 raise ValueError(
                     f"Unknown parameter {name}. Allowed parameters are: {', '.join(self.parameters.keys())}"
                 )
             self.parameters[name].set(param)
 
-        for name, prompt in doc["prompts"].items():
+        for name, prompt in cast(dict, doc["prompts"]).items():
             self.prompts[name] = prompt
 
     def get(self, parameter_name: str) -> Any:
