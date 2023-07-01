@@ -25,8 +25,34 @@ def prompt_continuation(width: int, line_number, is_soft_wrap):
     return "." * (width - 1) + " "
 
 
+def print_streaming_message(model: Model, messages, config: Config):
+    """Prints a message that is being streamed from the API"""
+    new_message_str = ""
+    for printable_chunk in model.stream_call(messages, config):
+        sys.stdout.write(printable_chunk)
+        sys.stdout.flush()
+        new_message_str += printable_chunk
+    print("\n")
+    new_message = {"role": "assistant", "content" : new_message_str}
+    return new_message
+
+def print_message(model: Model, messages, config: Config):
+    """Prints a message that is being returned from the API"""
+
+    spinner = Spinner()
+    spinner.start()
+
+    new_message = model.call(messages, config)
+    spinner.stop()
+    print(" ")
+    config.code_formatter.highlight_codeblocks(
+        new_message["content"])
+    print("\n")
+    return new_message
+
 def loop(config: Config, model: Model):
     """Main loop for the program"""
+
 
     # Move the fdollowing two lines into config, too
     style = Style.from_dict({"prompt": "#aaaaaa"})
@@ -39,24 +65,19 @@ def loop(config: Config, model: Model):
         result = session.prompt(
             ">>> ", multiline=True, prompt_continuation=prompt_continuation
         )
+        print()
 
         messages.append({"role": "user", "content": result})
 
-        spinner = Spinner()
-        spinner.start()
-
-        new_message = model.call(messages, config)
-        spinner.stop()
+        if config.parameters["no-stream"].value is True:
+            new_message = print_message(model, messages, config)
+        else:
+            new_message = print_streaming_message(model, messages, config)
 
         messages.append(new_message)
 
-        print(" ")
-        config.code_formatter.highlight_codeblocks(
-            new_message["content"])
-        print("\n")
 
-
-def main():
+def main() -> None:
     print(f"AIssist v.{__version__}. ESCAPE followed by ENTER to send. Ctrl-C to quit")
     print("\n")
 

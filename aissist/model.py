@@ -42,7 +42,28 @@ class Model:
         message = response["choices"][0]["message"]
         return message
 
-    def messages_to_tokens(self, messages, model="gpt-3.5-turbo-0613"):
+    def stream_call(self, messages, config):
+        self.trim_messages_to_context(messages, config.get("max_tokens"))
+
+        response = openai.ChatCompletion.create(
+            model=self.name,
+            temperature=config.get("temperature"),
+            max_tokens=config.get("max_tokens"),
+            messages=messages,
+            stream=True
+        )
+
+        buffer = ""
+        in_code = False
+        for chunk in response:
+
+            if chunk.choices[0]["finish_reason"] is not None:
+                return buffer
+            
+            delta = chunk.choices[0]["delta"]["content"]
+            yield delta
+
+    def messages_to_tokens(self, messages: list[dict], model: str="gpt-3.5-turbo-0613") -> int:
         """Return the number of tokens used by a list of messages.
 
         https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb

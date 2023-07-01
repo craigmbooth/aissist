@@ -1,13 +1,14 @@
 import argparse
 import dataclasses
 import os
-from typing import Any, Type, cast
+from typing import Any, Type, cast, TypeVar
 
 from tomlkit import comment, document, nl, parse, table
 
 from .code_formatter import CodeFormatter
 from .prompts import DEFAULT_PROMPTS
 
+T = TypeVar('T')
 
 @dataclasses.dataclass
 class Parameter:
@@ -15,10 +16,10 @@ class Parameter:
     value: Any
     comment: str = ""
 
-    def __str__(self):
-        return f"{self.name}={self.value}"
+    def __str__(self) -> str:
+        return f"{self.value}"
 
-    def set(self, value):
+    def set(self, value: T) -> None:
         if not isinstance(value, self.type):
             raise TypeError(f"Expected {self.type}, got {type(value)}")
         self.value = value
@@ -33,6 +34,11 @@ class Config:
             str,
             "code",
             comment="The default prompt to use. See the prompts.py file for a list of available prompts.",
+        ),
+        "no-stream": Parameter(
+            bool,
+            True,
+            comment="Don't stream the output from the API."
         ),
         "color-scheme": Parameter(
             str,
@@ -83,13 +89,24 @@ class Config:
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
         for name, param in self.default_parameters.items():
-            parser.add_argument(
-                f"--{name}",
-                type=param.type,
-                default=param.value,
-                metavar=f"<{name}>",
-                help=param.comment,
-            )
+
+            if param.type == bool:
+                # For a bool we need to add a store true and store false
+                parser.add_argument(
+                    f"--{name}",
+                    action="store_true",
+                    default=False,
+                    help=param.comment,
+                )
+            else:
+
+                parser.add_argument(
+                    f"--{name}",
+                    type=param.type,
+                    default=param.value,
+                    metavar=f"<{name}>",
+                    help=param.comment,
+                )
         args = parser.parse_args()
 
         for name, param in self.parameters.items():
