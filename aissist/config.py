@@ -1,14 +1,15 @@
 import argparse
 import dataclasses
 import os
-from typing import Any, Type, cast, TypeVar
+from typing import Any, Type, TypeVar, cast
 
 from tomlkit import comment, document, nl, parse, table
 
 from .code_formatter import CodeFormatter
 from .prompts import DEFAULT_PROMPTS
 
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 @dataclasses.dataclass
 class Parameter:
@@ -36,9 +37,7 @@ class Config:
             comment="The default prompt to use. See the prompts.py file for a list of available prompts.",
         ),
         "no-stream": Parameter(
-            bool,
-            True,
-            comment="Don't stream the output from the API."
+            bool, True, comment="Don't stream the output from the API."
         ),
         "color-scheme": Parameter(
             str,
@@ -89,7 +88,6 @@ class Config:
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
         for name, param in self.default_parameters.items():
-
             if param.type == bool:
                 # For a bool we need to add a store true and store false
                 parser.add_argument(
@@ -99,7 +97,6 @@ class Config:
                     help=param.comment,
                 )
             else:
-
                 parser.add_argument(
                     f"--{name}",
                     type=param.type,

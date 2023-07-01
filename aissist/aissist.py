@@ -10,7 +10,7 @@ from pygments.lexers import guess_lexer
 
 from .config import Config
 from .exceptions import AIssistError
-from .model import Model
+from .model import Model, OpenAIMessage
 from .spinner import Spinner
 from .version import __version__
 
@@ -21,11 +21,13 @@ except KeyError:
     sys.exit(1)
 
 
-def prompt_continuation(width: int, line_number, is_soft_wrap):
+def prompt_continuation(width: int, line_number: int, is_soft_wrap: int) -> str:
     return "." * (width - 1) + " "
 
 
-def print_streaming_message(model: Model, messages, config: Config):
+def print_streaming_message(
+    model: Model, messages: list[OpenAIMessage], config: Config
+) -> OpenAIMessage:
     """Prints a message that is being streamed from the API"""
     new_message_str = ""
     for printable_chunk in model.stream_call(messages, config):
@@ -33,10 +35,13 @@ def print_streaming_message(model: Model, messages, config: Config):
         sys.stdout.flush()
         new_message_str += printable_chunk
     print("\n")
-    new_message = {"role": "assistant", "content" : new_message_str}
+    new_message: OpenAIMessage = {"role": "assistant", "content": new_message_str}
     return new_message
 
-def print_message(model: Model, messages, config: Config):
+
+def print_message(
+    model: Model, messages: list[OpenAIMessage], config: Config
+) -> OpenAIMessage:
     """Prints a message that is being returned from the API"""
 
     spinner = Spinner()
@@ -45,21 +50,21 @@ def print_message(model: Model, messages, config: Config):
     new_message = model.call(messages, config)
     spinner.stop()
     print(" ")
-    config.code_formatter.highlight_codeblocks(
-        new_message["content"])
+    config.code_formatter.highlight_codeblocks(new_message["content"])
     print("\n")
+
     return new_message
 
-def loop(config: Config, model: Model):
-    """Main loop for the program"""
 
+def loop(config: Config, model: Model) -> None:
+    """Main loop for the program"""
 
     # Move the fdollowing two lines into config, too
     style = Style.from_dict({"prompt": "#aaaaaa"})
     session: PromptSession = PromptSession(style=style)
     prompt = config.get_prompt()
 
-    messages = [{"role": "system", "content": prompt}]
+    messages: list[OpenAIMessage] = [{"role": "system", "content": prompt}]
 
     while True:
         result = session.prompt(

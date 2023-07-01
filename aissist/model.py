@@ -1,7 +1,15 @@
+from typing import Generator, TypedDict, cast
+
 import openai
 import tiktoken
 
+from .config import Config
 from .exceptions import InvalidParameterError
+
+
+class OpenAIMessage(TypedDict):
+    role: str
+    content: str
 
 
 class Model:
@@ -25,13 +33,15 @@ class Model:
             raise InvalidParameterError(f"Invalid model name: {self.name}")
 
     @property
-    def encoding(self):
+    def encoding(self) -> tiktoken.Encoding:
         return tiktoken.encoding_for_model(self.name)
 
-    def call(self, messages, config):
+    def call(self, messages: list[OpenAIMessage], config: Config) -> OpenAIMessage:
         self.trim_messages_to_context(messages, config.get("max_tokens"))
 
-        response = openai.ChatCompletion.create(
+        # n.b. ignoring types because
+        # error: Call to untyped function "create" of "ChatCompletion" in typed context
+        response = openai.ChatCompletion.create(  # type: ignore
             model=self.name,
             temperature=config.get("temperature"),
             max_tokens=config.get("max_tokens"),
@@ -40,30 +50,37 @@ class Model:
         )
 
         message = response["choices"][0]["message"]
-        return message
+        return cast(OpenAIMessage, message)
 
-    def stream_call(self, messages, config):
+    def stream_call(
+        self, messages: list[OpenAIMessage], config: Config
+    ) -> Generator[str, None, str]:
         self.trim_messages_to_context(messages, config.get("max_tokens"))
 
-        response = openai.ChatCompletion.create(
+        # n.b. ignoring types because
+        # error: Call to untyped function "create" of "ChatCompletion" in typed context
+        response = openai.ChatCompletion.create(  # type: ignore
             model=self.name,
             temperature=config.get("temperature"),
             max_tokens=config.get("max_tokens"),
             messages=messages,
-            stream=True
+            stream=True,
         )
 
         buffer = ""
         in_code = False
         for chunk in response:
-
             if chunk.choices[0]["finish_reason"] is not None:
                 return buffer
-            
+
             delta = chunk.choices[0]["delta"]["content"]
             yield delta
 
-    def messages_to_tokens(self, messages: list[dict], model: str="gpt-3.5-turbo-0613") -> int:
+        return ""
+
+    def messages_to_tokens(
+        self, messages: list[OpenAIMessage], model: str = "gpt-3.5-turbo-0613"
+    ) -> int:
         """Return the number of tokens used by a list of messages.
 
         https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
@@ -96,13 +113,15 @@ class Model:
         for message in messages:
             num_tokens += tokens_per_message
             for key, value in message.items():
-                num_tokens += len(self.encoding.encode(value))
+                num_tokens += len(self.encoding.encode(cast(str, value)))
                 if key == "name":
                     num_tokens += tokens_per_name
         num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
         return num_tokens
 
-    def trim_messages_to_context(self, messages, max_tokens):
+    def trim_messages_to_context(
+        self, messages: list[OpenAIMessage], max_tokens: int
+    ) -> list[OpenAIMessage]:
         message_tokens = self.messages_to_tokens(messages, self.name)
 
         total_tokens = message_tokens + max_tokens
