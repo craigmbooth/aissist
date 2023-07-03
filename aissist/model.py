@@ -29,8 +29,8 @@ class Model:
         self.name = name
         try:
             self.context = self.model_lookup[self.name]
-        except KeyError:
-            raise InvalidParameterError(f"Invalid model name: {self.name}")
+        except KeyError as exc:
+            raise InvalidParameterError(f"Invalid model name: {self.name}") from exc
 
     @property
     def encoding(self) -> tiktoken.Encoding:
@@ -68,7 +68,6 @@ class Model:
         )
 
         buffer = ""
-        in_code = False
         for chunk in response:
             if chunk.choices[0]["finish_reason"] is not None:
                 return buffer
@@ -129,5 +128,5 @@ class Model:
         if total_tokens > self.context:
             messages.pop(0)
             return self.trim_messages_to_context(messages, max_tokens)
-        else:
-            return messages
+        
+        return messages

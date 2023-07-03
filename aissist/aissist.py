@@ -4,9 +4,6 @@ import sys
 import openai
 from prompt_toolkit import PromptSession
 from prompt_toolkit.styles import Style
-from pygments import highlight
-from pygments.formatters import TerminalTrueColorFormatter
-from pygments.lexers import guess_lexer
 
 from .config import Config
 from .exceptions import AIssistError
@@ -21,7 +18,7 @@ except KeyError:
     sys.exit(1)
 
 
-def prompt_continuation(width: int, line_number: int, is_soft_wrap: int) -> str:
+def prompt_continuation(width: int, line_number: int, is_soft_wrap: int) -> str: #pylint: disable=W0613
     return "." * (width - 1) + " "
 
 
@@ -98,7 +95,9 @@ def main() -> None:
     except AIssistError as e:
         print(e)
         sys.exit(1)
-    except Exception:
+    except Exception: #pylint: disable=W0706
+        # If we didn't catch the error with one of the specific exceptions above,
+        # print the stack trace and exit with a non-zero exit code.
         raise
 
 

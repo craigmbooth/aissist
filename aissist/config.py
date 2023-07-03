@@ -134,11 +134,11 @@ class Config:
 
         doc.add("prompts", prompts)
 
-        with open(self.config_file, "w") as f:
+        with open(self.config_file, "w", encoding="utf-8") as f:
             f.write(doc.as_string())
 
     def read_config(self) -> None:
-        with open(self.config_file, "r") as f:
+        with open(self.config_file, "r", encoding="utf-8") as f:
             doc = parse(f.read())
 
         for name, param in cast(dict, doc["parameters"]).items():
