@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-  deploy_labs:
+  test_library:
     permissions:
       contents: 'read'
       id-token: 'write'
