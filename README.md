@@ -1,5 +1,7 @@
 # AI Assistant
 
+[![Test AIssist](https://github.com/craigmbooth/aissist/actions/workflows/on-push.yml/badge.svg?branch=master&event=push)](https://github.com/craigmbooth/aissist/actions/workflows/on-push.yml)
+
 AIssist is a simple, but capable command-line-interface (CLI) to chat with OpenAI's cutting-edge AI models.
 
 Install me with `pip install aissist`.  Set the `OPENAI_API_KEY` environment variable to be your OpenAI API key, then type `ai`.
