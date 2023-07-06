@@ -27,8 +27,7 @@ jobs:
       - name: Install prerequisites
         run: |
           pip install pipenv
-          pipenv shell
           pipenv install -d
       - name: Run tests
         run: |
-          make test
+          pipenv run make test
