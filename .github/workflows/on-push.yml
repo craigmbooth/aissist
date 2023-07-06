@@ -1,0 +1,33 @@
+name: Test AIssist
+run-name: Test AIssist
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+
+jobs:
+
+  test_library:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+      pull-requests: 'write'
+      statuses: 'write'
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Install Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install prerequisites
+        run: |
+          pip install pipenv
+          pipenv install -d
+      - name: Run tests
+        run: |
+          pipenv run make test
