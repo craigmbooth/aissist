@@ -4,17 +4,17 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-prompt-toolkit = "*"
 openai = "*"
+prompt-toolkit = "*"
 pygments = "*"
-tomlkit = "*"
-toml = "*"
-isort = "*"
 tiktoken = "*"
+toml = "*"
+tomlkit = "*"
 
 [dev-packages]
 black = "*"
 flit = "*"
+isort = "*"
 mypy = "*"
 types-pygments = "*"
 pygount = "*"
