@@ -1,3 +1,5 @@
+"""Configuation class for aissist."""
+
 import argparse
 import dataclasses
 import os
@@ -27,6 +29,7 @@ class Parameter:
 
 
 class Config:
+    # The parameters known to AIssist.
     default_parameters: dict[str, Parameter] = {
         "model": Parameter(
             str, "gpt-3.5-turbo", comment="The default OpenAI model name to use"
@@ -57,12 +60,12 @@ class Config:
     }
 
     def __init__(self) -> None:
-        self.parameters: dict[str, Parameter] = {}
         self.prompts: dict[str, str] = {}
 
         self.config_file = os.path.join(os.path.expanduser("~"), ".aissistrc")
 
-        self.populate_default_parameters()
+        # Load the default parameters into self.parameters
+        self.parameters: dict[str, Parameter] = self.default_parameters.copy()
 
         # If the config file does not exist, write the
         # defaults there.
@@ -73,13 +76,16 @@ class Config:
             # any parameters
             self.read_config()
 
+        # Finally, if there are any command line parameters, overwrite the config
+        # with them.
         self.add_command_line_args()
 
     @property
     def code_formatter(self) -> CodeFormatter:
         return CodeFormatter(self.parameters["color-scheme"].value)
 
-    def get_prompt(self) -> str:
+    @property
+    def prompt(self) -> str:
         prompt = self.parameters["prompt"].value
         return self.prompts[prompt]
 
@@ -109,10 +115,9 @@ class Config:
         for name, param in self.parameters.items():
             param.set(getattr(args, name.replace("-", "_")))
 
-    def populate_default_parameters(self) -> None:
-        self.parameters = self.default_parameters.copy()
-
     def write_config(self) -> None:
+        """Write the default configuration to the config file."""
+
         doc = document()
         doc.add(comment("Configuration file for aissist."))
 
@@ -138,6 +143,8 @@ class Config:
             f.write(doc.as_string())
 
     def read_config(self) -> None:
+        """Read the configuration from the config file."""
+
         with open(self.config_file, "r", encoding="utf-8") as f:
             doc = parse(f.read())
 
