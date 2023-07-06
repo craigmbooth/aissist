@@ -3,11 +3,10 @@ import textwrap
 
 from pygments import highlight
 
-# I do not understand this, but pylint (2.17.4) raises 
+# I do not understand this, but pylint (2.17.4) raises
 # aissist/code_formatter.py:5:0: E0611: No name 'TerminalTrueColorFormatter' in module 'pygments.formatters' (no-name-in-module)
 # Nevertheless, the code works fine so I am ignoring it.
-from pygments.formatters import TerminalTrueColorFormatter #pylint: disable=E0611
-
+from pygments.formatters import TerminalTrueColorFormatter  # pylint: disable=E0611
 from pygments.lexers import guess_lexer
 
 

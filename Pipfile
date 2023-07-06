@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+importlib-metadata = "*"
 openai = "*"
 prompt-toolkit = "*"
 pygments = "*"

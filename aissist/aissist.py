@@ -18,7 +18,14 @@ except KeyError:
     sys.exit(1)
 
 
-def prompt_continuation(width: int, line_number: int, is_soft_wrap: int) -> str: #pylint: disable=W0613
+def prompt_continuation(
+    width: int, line_number: int, is_soft_wrap: int  # pylint: disable=W0613
+) -> str:
+    """When the user is typing a multi-line prompt, this function is called to
+    determine what the prompt should look like on the next line.
+
+    n.b. there are unused parameters to this function, but they are required by
+    the PromptSession.prompt_continuation interface."""
     return "." * (width - 1) + " "
 
 
@@ -26,6 +33,7 @@ def print_streaming_message(
     model: Model, messages: list[OpenAIMessage], config: Config
 ) -> OpenAIMessage:
     """Prints a message that is being streamed from the API"""
+
     new_message_str = ""
     for printable_chunk in model.stream_call(messages, config):
         sys.stdout.write(printable_chunk)
@@ -59,9 +67,8 @@ def loop(config: Config, model: Model) -> None:
     # Move the fdollowing two lines into config, too
     style = Style.from_dict({"prompt": "#aaaaaa"})
     session: PromptSession = PromptSession(style=style)
-    prompt = config.get_prompt()
 
-    messages: list[OpenAIMessage] = [{"role": "system", "content": prompt}]
+    messages: list[OpenAIMessage] = [{"role": "system", "content": config.prompt}]
 
     while True:
         result = session.prompt(
@@ -71,7 +78,7 @@ def loop(config: Config, model: Model) -> None:
 
         messages.append({"role": "user", "content": result})
 
-        if config.parameters["no-stream"].value is True:
+        if config.get("no-stream") is True:
             new_message = print_message(model, messages, config)
         else:
             new_message = print_streaming_message(model, messages, config)
@@ -95,7 +102,7 @@ def main() -> None:
     except AIssistError as e:
         print(e)
         sys.exit(1)
-    except Exception: #pylint: disable=W0706
+    except Exception:  # pylint: disable=W0706
         # If we didn't catch the error with one of the specific exceptions above,
         # print the stack trace and exit with a non-zero exit code.
         raise

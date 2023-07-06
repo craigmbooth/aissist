@@ -1,3 +1,4 @@
+"""Contains the Model class, which represents an OpenAI model."""
 from typing import Generator, TypedDict, cast
 
 import openai
@@ -8,13 +9,15 @@ from .exceptions import InvalidParameterError
 
 
 class OpenAIMessage(TypedDict):
+    """Structure of an element in a conversation with the OpenAI API."""
+
     role: str
     content: str
 
 
 class Model:
-    # Map model to
-    model_lookup = {
+    # Map model to context length.
+    model_lookup: dict[str, int] = {
         "gpt-3.5-turbo": 4096,
         "gpt-3.5-turbo-16k": 16384,
         "gpt-3.5-0613": 4096,
@@ -27,6 +30,7 @@ class Model:
 
     def __init__(self, name: str):
         self.name = name
+
         try:
             self.context = self.model_lookup[self.name]
         except KeyError as exc:
@@ -121,6 +125,11 @@ class Model:
     def trim_messages_to_context(
         self, messages: list[OpenAIMessage], max_tokens: int
     ) -> list[OpenAIMessage]:
+        """Given a list of messages, discard old messages until the total number of
+        tokens in the messages plus the max tokens in the completion is less than the
+        context length of the model.
+        """
+
         message_tokens = self.messages_to_tokens(messages, self.name)
 
         total_tokens = message_tokens + max_tokens
@@ -128,5 +137,5 @@ class Model:
         if total_tokens > self.context:
             messages.pop(0)
             return self.trim_messages_to_context(messages, max_tokens)
-        
+
         return messages
