@@ -70,6 +70,9 @@ def loop(config: Config, model: Model) -> None:
 
     messages: list[OpenAIMessage] = [{"role": "system", "content": config.prompt}]
 
+    get_completion_function = (print_message
+            if config.get("no-stream") is True else print_streaming_message)
+    
     while True:
         result = session.prompt(
             ">>> ", multiline=True, prompt_continuation=prompt_continuation
@@ -78,10 +81,7 @@ def loop(config: Config, model: Model) -> None:
 
         messages.append({"role": "user", "content": result})
 
-        if config.get("no-stream") is True:
-            new_message = print_message(model, messages, config)
-        else:
-            new_message = print_streaming_message(model, messages, config)
+        new_message = get_completion_function(model, messages, config)
 
         messages.append(new_message)
 
@@ -101,6 +101,9 @@ def main() -> None:
         sys.exit(0)
     except AIssistError as e:
         print(e)
+        sys.exit(1)
+    except openai.error.OpenAIError as e:
+        print(f"Received Error from openai: {str(e)}")
         sys.exit(1)
     except Exception:  # pylint: disable=W0706
         # If we didn't catch the error with one of the specific exceptions above,

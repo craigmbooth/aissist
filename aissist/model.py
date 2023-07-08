@@ -2,6 +2,7 @@
 from typing import Generator, TypedDict, cast
 
 import openai
+from retry import retry
 import tiktoken
 
 from .config import Config
@@ -40,6 +41,11 @@ class Model:
     def encoding(self) -> tiktoken.Encoding:
         return tiktoken.encoding_for_model(self.name)
 
+    @retry((openai.error.APIError, openai.error.APIConnectionError,
+            openai.error.RateLimitError, openai.error.ServiceUnavailableError),
+        tries=3,
+        delay=2,
+        backoff=2)
     def call(self, messages: list[OpenAIMessage], config: Config) -> OpenAIMessage:
         self.trim_messages_to_context(messages, config.get("max_tokens"))
 
@@ -56,6 +62,12 @@ class Model:
         message = response["choices"][0]["message"]
         return cast(OpenAIMessage, message)
 
+
+    @retry((openai.error.APIError, openai.error.APIConnectionError,
+            openai.error.RateLimitError, openai.error.ServiceUnavailableError),
+        tries=3,
+        delay=2,
+        backoff=2)
     def stream_call(
         self, messages: list[OpenAIMessage], config: Config
     ) -> Generator[str, None, str]:

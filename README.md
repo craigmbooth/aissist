@@ -47,3 +47,11 @@ On first run, `aissist` will write a configuration file (`.aissist`) to your hom
 1. Command-line argument
 2. `.aissist` setting
 3. Default setting
+
+## Versioning
+
+AIssist follows semantic versioning thus you should expect that:
+
+* If the patch version is increased, only bugfixes have taken place
+* If the minor version is increased, only additive changes have been made to the program.  Your existing workflows will work fine.
+* If the major version is increased, the user may notice backward incompatible changes, or feature deprecations.
