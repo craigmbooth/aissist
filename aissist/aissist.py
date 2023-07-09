@@ -70,9 +70,10 @@ def loop(config: Config, model: Model) -> None:
 
     messages: list[OpenAIMessage] = [{"role": "system", "content": config.prompt}]
 
-    get_completion_function = (print_message
-            if config.get("no-stream") is True else print_streaming_message)
-    
+    get_completion_function = (
+        print_message if config.get("no-stream") is True else print_streaming_message
+    )
+
     while True:
         result = session.prompt(
             ">>> ", multiline=True, prompt_continuation=prompt_continuation

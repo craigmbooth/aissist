@@ -25,10 +25,10 @@ classifiers = [
 requires-python = ">=3.7"
 
 dependencies = [
-  "openai<0.28",
+  "importlib_metadata<7",
+  "openai<1",
   "prompt_toolkit<4",
   "pygments<3",
-  "requests<3",
   "retry<1",
   "tiktoken<1",
   "tomlkit<1"
