@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f94c562eea8c43ac74599a1c7dbda958973a5f338bd7762ce330a528390a78f7"
+            "sha256": "d501639780a644e166f2cf2d2cce276ecb2fbefbad936108b7979b2979c64e41"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -696,21 +696,21 @@
         },
         "zipp": {
             "hashes": [
-                "sha256:112929ad649da941c23de50f356a2b5570c954b65150642bccdd66bf194d224b",
-                "sha256:48904fc76a60e542af151aded95726c1a5c34ed43ab4134b597665c86d7ad556"
+                "sha256:1876cb065531855bbe83b6c489dcf69ecc28f1068d8e95959fe8bbc77774c941",
+                "sha256:5dadc3ad0a1f825fe42ce1bce0f2fc5a13af2e6b2d386af5b0ff295bc0a287d3"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==3.15.0"
+            "markers": "python_version >= '3.8'",
+            "version": "==3.16.0"
         }
     },
     "develop": {
         "astroid": {
             "hashes": [
-                "sha256:078e5212f9885fa85fbb0cf0101978a336190aadea6e13305409d099f71b2324",
-                "sha256:1039262575027b441137ab4a62a793a9b43defb42c32d5670f38686207cd780f"
+                "sha256:389656ca57b6108f939cf5d2f9a2a825a3be50ba9d589670f393236e0a03b91c",
+                "sha256:903f024859b7c7687d7a7f3a3f73b17301f8e42dfd9cc9df9d4418172d3e2dbd"
             ],
             "markers": "python_full_version >= '3.7.2'",
-            "version": "==2.15.5"
+            "version": "==2.15.6"
         },
         "black": {
             "hashes": [
@@ -1160,6 +1160,14 @@
             ],
             "index": "pypi",
             "version": "==2.15.0.1"
+        },
+        "types-retry": {
+            "hashes": [
+                "sha256:1b7a0a04adf12f21237e76833574a9a8f755f88889c226ad99d6e3bfa5b6e3c8",
+                "sha256:238fdb08794862d951187250e443257bb09e927404c88edf7ce88618f4357c2a"
+            ],
+            "index": "pypi",
+            "version": "==0.9.9.3"
         },
         "types-setuptools": {
             "hashes": [
