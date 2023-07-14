@@ -88,28 +88,31 @@ def loop(config: Config, model: Model) -> None:
 
 
 def main() -> None:
-    print(f"AIssist v.{__version__}. ESCAPE followed by ENTER to send. Ctrl-C to quit")
+    print(f"AIssist v.{__version__}. ESCAPE followed by ENTER to send. Ctrl-D to quit")
     print("\n")
 
     config = Config()
     model = Model(config.get("model"))
 
-    try:
-        while True:
+    while True:
+        try:
             loop(config, model)
-    except (KeyboardInterrupt, EOFError):
-        # Ctrl-C and Ctrl-D
-        sys.exit(0)
-    except AIssistError as e:
-        print(e)
-        sys.exit(1)
-    except openai.error.OpenAIError as e:
-        print(f"Received Error from openai: {str(e)}")
-        sys.exit(1)
-    except Exception:  # pylint: disable=W0706
-        # If we didn't catch the error with one of the specific exceptions above,
-        # print the stack trace and exit with a non-zero exit code.
-        raise
+        except KeyboardInterrupt:
+            # Ctrl-C
+            print("Ctrl-C stops current activity. Ctrl-D exits.")
+        except EOFError:
+            # Ctrl-D
+            sys.exit(0)
+        except AIssistError as e:
+            print(e)
+            sys.exit(1)
+        except openai.error.OpenAIError as e:
+            print(f"Received Error from openai: {str(e)}")
+            sys.exit(1)
+        except Exception:  # pylint: disable=W0706
+            # If we didn't catch the error with one of the specific exceptions above,
+            # print the stack trace and exit with a non-zero exit code.
+            raise
 
 
 if __name__ == "__main__":

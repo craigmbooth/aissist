@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "aissist"
-version = "0.0.14"
+version = "0.1.0"
 description = "A simple GPT command line chat interface"
 authors = [
   { name = "Craig Booth", email = "craigmbooth@gmail.com" },
