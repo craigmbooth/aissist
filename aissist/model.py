@@ -2,6 +2,7 @@
 from typing import Generator, TypedDict, cast
 
 import openai
+from litellm import completion
 import tiktoken
 from retry import retry
 
@@ -57,7 +58,7 @@ class Model:
 
         # n.b. ignoring types because
         # error: Call to untyped function "create" of "ChatCompletion" in typed context
-        response = openai.ChatCompletion.create(  # type: ignore
+        response = completion(  # type: ignore
             model=self.name,
             temperature=config.get("temperature"),
             max_tokens=config.get("max_tokens"),
@@ -86,7 +87,7 @@ class Model:
 
         # n.b. ignoring types because
         # error: Call to untyped function "create" of "ChatCompletion" in typed context
-        response = openai.ChatCompletion.create(  # type: ignore
+        response = completion(  # type: ignore
             model=self.name,
             temperature=config.get("temperature"),
             max_tokens=config.get("max_tokens"),
